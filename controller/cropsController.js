@@ -79,6 +79,36 @@ module.exports.modifyCrops = async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
-module.exports.readCrops = (req, res) => {
-    
-}
+module.exports.readCrops = async (req, res) => {
+    try {
+        const { cropId } = req.body;
+        if (!cropId) {
+            return res.status(400).json({ error: 'Crop ID is required' });
+        }
+        const crop = await Crop.findById(cropId);
+        if (!crop) {
+            return res.status(404).json({ error: 'Crop not found' });
+        }
+        res.status(200).json({ crop });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+module.exports.getUserIdsByCropName = async (req, res) => {
+    try {
+        const { cropName } = req.body;
+        if (!cropName) {
+            return res.status(400).json({ error: 'Crop name is required' });
+        }
+        const crops = await Crop.find({ cropname: cropName });
+        const userIds = crops.map(crop => crop.userId);
+        res.status(200).json({ userIds });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+};
+
+
+
